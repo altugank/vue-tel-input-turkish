@@ -996,7 +996,7 @@ function setCaretPosition(ctrl, pos) {
   }
 }
 var defaultOptions = {
-  placeholder: 'Enter a phone number',
+  placeholder: 'Telefon Numarasi',
   disabledFetchingCountry: false,
   disabled: false,
   mode: '',
