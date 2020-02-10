@@ -296,7 +296,7 @@ export default {
       return result;
     },
     phoneText() {
-      let key = 'input';
+      let key = this.parsedMode;
       if (this.phoneObject.valid) {
         key = this.parsedMode;
       }
