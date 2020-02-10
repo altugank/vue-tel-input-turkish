@@ -58,9 +58,7 @@
 
 <script>
 import PhoneNumber from 'awesome-phonenumber';
-// eslint-disable-next-line no-unused-vars
 import { AsYouType } from 'libphonenumber-js';
-// eslint-disable-next-line no-unused-vars
 import utils, { getCountry, setCaretPosition } from '../utils';
 
 function getDefault(key) {
