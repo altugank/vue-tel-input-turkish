@@ -9,7 +9,7 @@
       @keydown.esc="reset"
     >
       <span class="vti__selection">
-        <div v-if="enabledFlags" :class="['vti__flag', activeCountry.iso2.toLowerCase()]" />
+        <div v-if="enabledFlags" :class="['vti__flag', activeCountry.iso2.toLowerCase()]"/>
         <span v-if="enabledCountryCode" class="vti__country-code">
           +{{ activeCountry.dialCode }}
         </span>
@@ -25,7 +25,7 @@
           @click="choose(pb, true)"
           @mousemove="selectedIndex = index"
         >
-          <div v-if="enabledFlags" :class="['vti__flag', pb.iso2.toLowerCase()]" />
+          <div v-if="enabledFlags" :class="['vti__flag', pb.iso2.toLowerCase()]"/>
           <strong>{{ pb.name }}</strong>
           <span v-if="dropdownOptions && !dropdownOptions.disabledDialCode">
             +{{ pb.dialCode }}
@@ -58,6 +58,9 @@
 
 <script>
 import PhoneNumber from 'awesome-phonenumber';
+// eslint-disable-next-line no-unused-vars
+import { AsYouType } from 'libphonenumber-js';
+// eslint-disable-next-line no-unused-vars
 import utils, { getCountry, setCaretPosition } from '../utils';
 
 function getDefault(key) {
@@ -100,8 +103,8 @@ export default {
         const handler = (e) => {
           // Fall back to composedPath if e.path is undefined
           const path = e.path
-            || (e.composedPath ? e.composedPath() : false)
-            || getParents(e.target);
+              || (e.composedPath ? e.composedPath() : false)
+              || getParents(e.target);
           if (bubble || (path.length && !el.contains(path[0]) && el !== path[0])) {
             binding.value(e);
           }
@@ -121,6 +124,10 @@ export default {
     value: {
       type: String,
       default: '',
+    },
+    asYouType :{
+      type:Boolean,
+      default : true
     },
     placeholder: {
       type: String,
@@ -274,7 +281,7 @@ export default {
       if (this.ignoredCountries.length) {
         return this.allCountries.filter(
           ({ iso2 }) => !this.ignoredCountries.includes(iso2.toUpperCase())
-            && !this.ignoredCountries.includes(iso2.toLowerCase()),
+              && !this.ignoredCountries.includes(iso2.toLowerCase()),
         );
       }
 
@@ -328,7 +335,9 @@ export default {
       const isValidCharactersOnly = this.validCharactersOnly && !this.testCharacters();
       const isCustomValidate = this.customValidate && !this.testCustomValidate();
       if (isValidCharactersOnly || isCustomValidate) {
-        this.$nextTick(() => { this.phone = oldValue; });
+        this.$nextTick(() => {
+          this.phone = oldValue;
+        });
       } else if (newValue) {
         if (newValue[0] === '+') {
           const code = PhoneNumber(newValue).getRegionCode();
@@ -339,8 +348,13 @@ export default {
       }
       // Reset the cursor to current position if it's not the last character.
       if (this.cursorPosition < oldValue.length) {
-        this.$nextTick(() => { setCaretPosition(this.$refs.input, this.cursorPosition); });
+        this.$nextTick(() => {
+          setCaretPosition(this.$refs.input, this.cursorPosition);
+        });
       }
+    if(this.asYouType){
+      this.phone = new AsYouType(this.activeCountry.iso2).input(this.phone);
+    }
     },
     activeCountry(value) {
       if (value && value.iso2) {
@@ -352,9 +366,9 @@ export default {
     this.initializeCountry()
       .then(() => {
         if (!this.phone
-          && this.inputOptions
-          && this.inputOptions.showDialCode
-          && this.activeCountry.dialCode) {
+            && this.inputOptions
+            && this.inputOptions.showDialCode
+            && this.activeCountry.dialCode) {
           this.phone = `+${this.activeCountry.dialCode}`;
         }
         this.$emit('validate', this.phoneObject);
@@ -374,8 +388,8 @@ export default {
     initializeCountry() {
       return new Promise((resolve) => {
         /**
-         * 1. If the phone included prefix (+12), try to get the country and set it
-         */
+           * 1. If the phone included prefix (+12), try to get the country and set it
+           */
         if (this.phone && this.phone[0] === '+') {
           const activeCountry = PhoneNumber(this.phone).getRegionCode();
           if (activeCountry) {
@@ -385,8 +399,8 @@ export default {
           }
         }
         /**
-         * 2. Use default country if passed from parent
-         */
+           * 2. Use default country if passed from parent
+           */
         if (this.defaultCountry) {
           const defaultCountry = this.findCountry(this.defaultCountry);
           if (defaultCountry) {
@@ -396,10 +410,10 @@ export default {
           }
         }
         const fallbackCountry = this.findCountry(this.preferredCountries[0])
-          || this.filteredCountries[0];
-        /**
-         * 3. Check if fetching country based on user's IP is allowed, set it as the default country
-         */
+            || this.filteredCountries[0];
+          /**
+           * 3. Check if fetching country based on user's IP is allowed, set it as the default country
+           */
         if (!this.disabledFetchingCountry) {
           getCountry()
             .then((res) => {
@@ -408,8 +422,8 @@ export default {
             .catch((error) => {
               console.warn(error);
               /**
-               * 4. Use the first country from preferred list (if available) or all countries list
-               */
+                 * 4. Use the first country from preferred list (if available) or all countries list
+                 */
               this.choose(fallbackCountry);
             })
             .finally(() => {
@@ -417,16 +431,16 @@ export default {
             });
         } else {
           /**
-           * 4. Use the first country from preferred list (if available) or all countries list
-           */
+             * 4. Use the first country from preferred list (if available) or all countries list
+             */
           this.choose(fallbackCountry);
           resolve();
         }
       });
     },
     /**
-     * Get the list of countries from the list of iso2 code
-     */
+       * Get the list of countries from the list of iso2 code
+       */
     getCountries(list = []) {
       return list
         .map(countryCode => this.findCountry(countryCode))
@@ -455,9 +469,9 @@ export default {
       }
       this.activeCountry = parsedCountry || this.activeCountry || {};
       if (this.phone
-        && this.phone[0] === '+'
-        && this.activeCountry.iso2
-        && this.phoneObject.number.national) {
+          && this.phone[0] === '+'
+          && this.activeCountry.iso2
+          && this.phoneObject.number.national) {
         // Attach the current phone number with the newly selected country
         this.phone = PhoneNumber(this.phoneObject.number.national, this.activeCountry.iso2)
           .getNumber('international');
@@ -536,10 +550,10 @@ export default {
         }
         const selEle = this.$refs.list.children[this.selectedIndex];
         if (selEle.offsetTop + selEle.clientHeight
-          > this.$refs.list.scrollTop + this.$refs.list.clientHeight) {
+            > this.$refs.list.scrollTop + this.$refs.list.clientHeight) {
           this.$refs.list.scrollTop = selEle.offsetTop
-            - this.$refs.list.clientHeight
-            + selEle.clientHeight;
+              - this.$refs.list.clientHeight
+              + selEle.clientHeight;
         }
       } else if (e.keyCode === 38) {
         // up arrow
@@ -576,7 +590,7 @@ export default {
           const selEle = this.$refs.list.children[this.selectedIndex];
           const needToScrollTop = selEle.offsetTop < this.$refs.list.scrollTop;
           const needToScrollBottom = selEle.offsetTop + selEle.clientHeight
-            > this.$refs.list.scrollTop + this.$refs.list.clientHeight;
+              > this.$refs.list.scrollTop + this.$refs.list.clientHeight;
           if (needToScrollTop || needToScrollBottom) {
             this.$refs.list.scrollTop = selEle.offsetTop - this.$refs.list.clientHeight / 2;
           }
@@ -602,97 +616,115 @@ export default {
 
 <style src="../assets/sprite.css"></style>
 <style>
-.vue-tel-input {
-  border-radius: 3px;
-  display: flex;
-  border: 1px solid #bbb;
-  text-align: left;
-}
-.vue-tel-input.disabled .selection,
-.vue-tel-input.disabled .dropdown,
-.vue-tel-input.disabled input {
-  cursor: no-drop;
-}
-.vue-tel-input:focus-within {
-  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(102, 175, 233, 0.6);
-  border-color: #66afe9;
-}
-.vti__dropdown {
-  display: flex;
-  flex-direction: column;
-  align-content: center;
-  justify-content: center;
-  position: relative;
-  padding: 7px;
-  cursor: pointer;
-}
-.vti__dropdown.show {
-  max-height: 300px;
-  overflow: scroll;
-}
-.vti__dropdown.open {
-  background-color: #f3f3f3;
-}
-.vti__dropdown:hover {
-  background-color: #f3f3f3;
-}
-.vti__selection {
-  font-size: 0.8em;
-  display: flex;
-  align-items: center;
-}
-.vti__selection .vti__country-code {
-  color: #666;
-}
-.vti__flag {
-  margin-right: 5px;
-  margin-left: 5px;
-}
-.vti__dropdown-list {
-  z-index: 1;
-  padding: 0;
-  margin: 0;
-  text-align: left;
-  list-style: none;
-  max-height: 200px;
-  overflow-y: scroll;
-  position: absolute;
-  left: -1px;
-  background-color: #fff;
-  border: 1px solid #ccc;
-  width: 390px;
-}
-.vti__dropdown-list.below {
-  top: 33px;
-}
-.vti__dropdown-list.above {
-  top: auto;
-  bottom: 100%;
-}
-.vti__dropdown-arrow {
-  transform: scaleY(0.5);
-  display: inline-block;
-  color: #666;
-}
-.vti__dropdown-item {
-  cursor: pointer;
-  padding: 4px 15px;
-}
-.vti__dropdown-item.highlighted {
-  background-color: #f3f3f3;
-}
-.vti__dropdown-item.last-preferred {
-  border-bottom: 1px solid #cacaca;
-}
-.vti__dropdown-item .vti__flag {
-  display: inline-block;
-  margin-right: 5px;
-}
-.vti__input {
-  border: none;
-  border-radius: 0 2px 2px 0;
-  width: 100%;
-  outline: none;
-  padding-left: 7px;
-}
+  .vue-tel-input {
+    border-radius: 3px;
+    display: flex;
+    border: 1px solid #bbb;
+    text-align: left;
+  }
+
+  .vue-tel-input.disabled .selection,
+  .vue-tel-input.disabled .dropdown,
+  .vue-tel-input.disabled input {
+    cursor: no-drop;
+  }
+
+  .vue-tel-input:focus-within {
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(102, 175, 233, 0.6);
+    border-color: #66afe9;
+  }
+
+  .vti__dropdown {
+    display: flex;
+    flex-direction: column;
+    align-content: center;
+    justify-content: center;
+    position: relative;
+    padding: 7px;
+    cursor: pointer;
+  }
+
+  .vti__dropdown.show {
+    max-height: 300px;
+    overflow: scroll;
+  }
+
+  .vti__dropdown.open {
+    background-color: #f3f3f3;
+  }
+
+  .vti__dropdown:hover {
+    background-color: #f3f3f3;
+  }
+
+  .vti__selection {
+    font-size: 0.8em;
+    display: flex;
+    align-items: center;
+  }
+
+  .vti__selection .vti__country-code {
+    color: #666;
+  }
+
+  .vti__flag {
+    margin-right: 5px;
+    margin-left: 5px;
+  }
+
+  .vti__dropdown-list {
+    z-index: 1;
+    padding: 0;
+    margin: 0;
+    text-align: left;
+    list-style: none;
+    max-height: 200px;
+    overflow-y: scroll;
+    position: absolute;
+    left: -1px;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    width: 390px;
+  }
+
+  .vti__dropdown-list.below {
+    top: 33px;
+  }
+
+  .vti__dropdown-list.above {
+    top: auto;
+    bottom: 100%;
+  }
+
+  .vti__dropdown-arrow {
+    transform: scaleY(0.5);
+    display: inline-block;
+    color: #666;
+  }
+
+  .vti__dropdown-item {
+    cursor: pointer;
+    padding: 4px 15px;
+  }
+
+  .vti__dropdown-item.highlighted {
+    background-color: #f3f3f3;
+  }
+
+  .vti__dropdown-item.last-preferred {
+    border-bottom: 1px solid #cacaca;
+  }
+
+  .vti__dropdown-item .vti__flag {
+    display: inline-block;
+    margin-right: 5px;
+  }
+
+  .vti__input {
+    border: none;
+    border-radius: 0 2px 2px 0;
+    width: 100%;
+    outline: none;
+    padding-left: 7px;
+  }
 </style>

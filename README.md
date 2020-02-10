@@ -1,5 +1,16 @@
-# vue-tel-input
+# vue-tel-input-turkish
 International Telephone Input with Vue.
+
+Country names translated to turkish
+
+Added ability to format as you type
+
+Usage: 
+```html
+  <template>
+    <vue-tel-input :asYouType="true" v-model="phone"></vue-tel-input>
+  <template>
+  ```
 
 [![](https://img.shields.io/npm/dt/vue-tel-input.svg)](https://www.npmjs.com/package/vue-tel-input) [![](https://img.shields.io/github/stars/educationlink/vue-tel-input.svg)](https://github.com/EducationLink/vue-tel-input)
 
